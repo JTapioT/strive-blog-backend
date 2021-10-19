@@ -44,7 +44,11 @@ authorsRouter.post("/", (req,res) => {
   const authors = JSON.parse(fs.readFileSync(authorsJSONPath));
 
   // Create new author - add random id
-  let newAuthor = {...req.body, id: Date.now()};
+  let newAuthor = {
+    ...req.body,
+    id: Date.now(),
+    avatar: `https://ui-avatars.com/api/?name=${req.body.name}+${req.body.surname}`,
+  };
 
   // Push new author to existing authors array
   authors.push(newAuthor);
@@ -56,6 +60,8 @@ authorsRouter.post("/", (req,res) => {
   res.status(201).send({id: newAuthor.id});
 })
 
+// EXTRA
+// Check that same e-mail does not exist already.
 authorsRouter.post("/checkEmail", (req,res) => {
   // Read authors.json
   const authors = JSON.parse(fs.readFileSync(authorsJSONPath));
