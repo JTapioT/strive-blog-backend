@@ -2,6 +2,7 @@ import express from 'express';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { send } from 'process';
 
 const authorsRouter = express.Router();
 
@@ -55,6 +56,16 @@ authorsRouter.post("/", (req,res) => {
   res.status(201).send({id: newAuthor.id});
 })
 
+authorsRouter.post("/checkEmail", (req,res) => {
+  // Read authors.json
+  const authors = JSON.parse(fs.readFileSync(authorsJSONPath));
+
+  let response = authors.findIndex((author) => author.email.toLowerCase() === req.body.email.toLowerCase()) === undefined ? false : true
+
+  // Is this even valid in any way to just send boolean value as a response??
+  res.status(200).send(response);
+
+})
 
 
 
