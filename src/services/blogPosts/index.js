@@ -106,6 +106,7 @@ blogPostsRouter.post("/", blogPostValidationMiddlewares, (req, res, next) => {
 });
 
 
+
 // PUT /blogPosts/:id
 blogPostsRouter.put("/:id", (req,res,next) => {
   try {
@@ -134,6 +135,8 @@ blogPostsRouter.put("/:id", (req,res,next) => {
     next(error);
   }
 });
+
+
 
 // DELETE /blogPosts/:id
 blogPostsRouter.delete("/:id", (req,res,next) => {

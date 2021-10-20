@@ -4,7 +4,6 @@ import { body } from 'express-validator';
 // Validate within Author that name is string, avatar is an URL.
 // Validate within readTime that value is numeric and unit is 'minute' and nothing else??
 
-// Can you validate that content is besides string a HTML??
 
 
 export const blogPostValidationMiddlewares = [
