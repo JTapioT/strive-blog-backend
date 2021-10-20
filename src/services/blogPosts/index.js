@@ -60,7 +60,7 @@ blogPostsRouter.get("/:id", (req, res, next) => {
     const blogPost = blogPosts.find(blogPost => blogPost._id === req.params.id)
 
     // If found by id, send response
-    // If not, create an error with status 204 (No content), including message.
+    // If not, create an error with status 404, including message.
     if(blogPost) {
       res.send(blogPost);
     } else {
