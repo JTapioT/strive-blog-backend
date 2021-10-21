@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { response } from 'express';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -6,6 +6,8 @@ import uniqid from 'uniqid';
 import createHttpError from "http-errors";
 import { validationResult } from "express-validator";
 import { authorValidationMiddlewares } from '../../validation.js';
+import multer from 'multer';
+import { saveAvatarImages } from '../../lib/fs-tools.js';
 
 
 const authorsRouter = express.Router();
@@ -30,7 +32,7 @@ function writeAuthors(content) {
 }
 
 // Return list of all authors - GET
-authorsRouter.get("/", (req,res) => {
+authorsRouter.get("/", (req,res, next) => {
 
   try {
     // Get authors, [{},{}..]
@@ -50,8 +52,8 @@ authorsRouter.get("/", (req,res) => {
 
 
 // Return a single author by id - GET
-// I need to use parseInt() since existing author.id is in a string form??.
-authorsRouter.get("/:id", (req,res) => {
+// I need to use parseInt() since existing author.id is in a string form.
+authorsRouter.get("/:id", (req,res, next) => {
   try {
     // Read authors.json
     const authors = getAuthors();
@@ -75,8 +77,7 @@ authorsRouter.get("/:id", (req,res) => {
 
 
 // Create a new author - POST
-// Should here happen the validation that req.body has information what is needed?? - Reject if body does not contain necessary info etc..?
-authorsRouter.post("/", authorValidationMiddlewares, (req,res) => {
+authorsRouter.post("/", authorValidationMiddlewares, (req,res, next) => {
 
   try {
     // Read authors.json
@@ -86,7 +87,7 @@ authorsRouter.post("/", authorValidationMiddlewares, (req,res) => {
     let newAuthor = {
       ...req.body,
       id: uniqid(),
-      avatar: `https://ui-avatars.com/api/?name=${req.body.name}+${req.body.surname}`,
+      avatar: `http://localhost:3001/public/avatarImages/${id}`,
       createdAt: new Date()
     };
   
@@ -104,9 +105,37 @@ authorsRouter.post("/", authorValidationMiddlewares, (req,res) => {
   }
 })
 
-// EXTRA
-// Check that same e-mail does not exist already.
-authorsRouter.post("/checkEmail", (req,res) => {
+// Upload author avatar image - POST
+authorsRouter.post("/:id/uploadAvatar", multer().single("avatar"), async (req, res, next) => {
+  try {
+    // Slice out the file-extension part to add it concatenated with id:
+    const fileExtension = req.file.originalname.slice(
+      req.file.originalname.indexOf(".")
+    );
+    const fileName = `${req.params.id}${fileExtension}`
+    //console.log(fileName);
+
+    await saveAvatarImages(fileName, req.file.buffer);
+    res.status(201).send({ status: "success" });
+    // Update the author avatar accordingly within author information:
+    let authors = getAuthors();
+    let index = authors.findIndex(author => author.id === parseInt(req.params.id));
+    
+    let editedAuthor = {...authors[index], avatar: `http://localhost:3001/authorImages/${fileName}`};
+    authors[index] = editedAuthor;
+
+    writeAuthors(authors);
+
+
+  } catch (error) {
+    next(error);
+  }
+ 
+})
+
+
+// Check that same e-mail does not exist already - POST
+authorsRouter.post("/checkEmail", (req,res, next) => {
   try {
     const authors = getAuthors();
     let response =
@@ -125,7 +154,7 @@ authorsRouter.post("/checkEmail", (req,res) => {
 
 
 // Edit the author with the given id - PUT
-authorsRouter.put("/:id", (req,res) => {
+authorsRouter.put("/:id", (req,res, next) => {
   try {
     // Read authors.json
     const authors = getAuthors();
@@ -158,7 +187,7 @@ authorsRouter.put("/:id", (req,res) => {
 
 
 // Delete the author by id - DELETE
-authorsRouter.delete("/:id", (req,res) => {
+authorsRouter.delete("/:id", (req,res, next) => {
   try {
     // Read authors.json
     const authors = getAuthors();

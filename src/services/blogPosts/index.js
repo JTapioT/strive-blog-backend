@@ -6,6 +6,9 @@ import uniqid from 'uniqid';
 import createHttpError from "http-errors";
 import { blogPostValidationMiddlewares } from "../../validation.js";
 import { validationResult } from "express-validator";
+import multer from "multer";
+import { saveCoverImages } from "../../lib/fs-tools.js";
+import { getBlogPosts, writeBlogPosts } from "../../lib/fs-tools.js";
 
 
 
@@ -15,14 +18,16 @@ const blogPostsJSONPath = join(parentFolderPath, "../../data/blogPosts.json");
 // Concise way:
 // const blogPostsJSONPath = join(dirname(fileURLToPath(import.meta.url)), "../../data/blogPosts.json")
 
+// join(dirname(fileURLToPath(import.meta.url)), "../data")
+
 // Read from blogPosts.json the blogPosts.
-function getBlogPosts() {
+/* function getBlogPosts() {
   return JSON.parse(fs.readFileSync(blogPostsJSONPath))
 }
 // Overwrite the blogPosts.json.
 function writeBlogPosts(content) {
   fs.writeFileSync(blogPostsJSONPath, JSON.stringify(content));
-}
+} */
 
 // Router
 const blogPostsRouter = express.Router();
@@ -50,13 +55,13 @@ blogPostsRouter.get("/", (req,res, next) => {
 
 
 // GET /blogPosts/:id
-blogPostsRouter.get("/:id", (req, res, next) => {
+blogPostsRouter.get("/:id", async (req, res, next) => {
   try {
 
     // Get all blog posts
-    const blogPosts = getBlogPosts();
+    const blogPosts = await getBlogPosts();
 
-    // Blog post by id:
+    // Blog post by id: 
     const blogPost = blogPosts.find(blogPost => blogPost._id === req.params.id)
 
     // If found by id, send response
@@ -72,10 +77,73 @@ blogPostsRouter.get("/:id", (req, res, next) => {
   }
 });
 
+// GET /blogPosts/:id/comments
+
+blogPostsRouter.get("/:id/comments", async (req,res,next) => {
+  // Get all blog posts
+  const blogPosts = await getBlogPosts();
+
+  // Blog post by id:
+  const blogPost = blogPosts.find((blogPost) => blogPost._id === req.params.id);
+
+  // If found by id, send response
+  // If not, create an error with status 404, including message.
+  if (blogPost) {
+    res.send(blogPost.comments);
+  } else {
+    next(
+      createHttpError(404, `No blog post found with an id:${req.params.id}`)
+    );
+  }
+})
+
+
+// POST :id/comments 
+blogPostsRouter.post("/:id/comments", async (req,res,next) => {
+  try {
+    // Get all blog posts
+    const blogPosts = await getBlogPosts();
+
+    // Blog post by id:
+    const blogPost = blogPosts.find(
+      (blogPost) => blogPost._id === req.params.id
+    );
+
+    // If found by id, send response
+    // If not, create an error with status 404, including message.
+    if (blogPost) {
+      // Edit comments array:
+      let editedBlogPostComments = [
+        ...blogPost.comments,
+        { name: req.body.name, message: req.body.message },
+      ];
+      // Overwrite existing comments array of blog post:
+      blogPost.comments = editedBlogPostComments;
+
+      let index = blogPosts.findIndex(
+        (blogPost) => blogPost._id === req.params.id
+      );
+      // Overwrite existing blogPost
+      blogPosts[index] = blogPost;
+      // Overwrite blogPosts.json
+      await writeBlogPosts(blogPosts);
+
+      res.send({ status: "success", message: req.body.message });
+    } else {
+      next(
+        createHttpError(404, `No blog post found with an id:${req.params.id}`)
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+  
+})
+
 
 // POST /blogPosts
 // For now, verbose naming for middleware.. change later.
-blogPostsRouter.post("/", blogPostValidationMiddlewares, (req, res, next) => {
+blogPostsRouter.post("/", blogPostValidationMiddlewares, async (req, res, next) => {
   try {
     // Handle validationResult accordingly
     const errorsList = validationResult(req);
@@ -84,19 +152,22 @@ blogPostsRouter.post("/", blogPostValidationMiddlewares, (req, res, next) => {
     }
 
     // Get all the blogPosts
-    const blogPosts = getBlogPosts();
+    const blogPosts = await getBlogPosts();
+    //console.log(blogPosts);
+
     // Create new blogPost object - add also unique id.
     const newBlogPost = {
       _id: uniqid(),
       ...req.body,
       createdAt: new Date(),
+      comments: []
     };
 
     // Push new blog post to blogPosts
     blogPosts.push(newBlogPost);
 
     // Overwrite the existing blogPosts.json()
-    writeBlogPosts(blogPosts);
+    await writeBlogPosts(blogPosts);
 
     // Send response
     res.status(201).send({ _id: newBlogPost._id });
@@ -107,11 +178,40 @@ blogPostsRouter.post("/", blogPostValidationMiddlewares, (req, res, next) => {
 
 
 
+// POST :id/uploadCover
+blogPostsRouter.post("/:id/uploadCover", multer().single("coverPhoto"), async (req,res,next) => {
+  try {
+    // Slice out the file-extension part to add it concatenated with id:
+    const fileExtension = req.file.originalname.slice(
+      req.file.originalname.indexOf(".")
+    );
+    const fileName = `${req.params.id}${fileExtension}`;
+    //console.log(fileName);
+
+    await saveCoverImages(fileName, req.file.buffer);
+    res.status(201).send({ status: "success" });
+
+    // Update blogPost cover accordingly:
+    let blogPosts = await getBlogPosts();
+    let index = blogPosts.findIndex(blogPost => blogPost._id === req.params.id);
+
+    let editedBlogPost = {...blogPosts[index], cover: `http://localhost:3001/blogImages/${fileName}`}
+
+    blogPosts[index] = editedBlogPost;
+
+    await writeBlogPosts(blogPosts);
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+
 // PUT /blogPosts/:id
-blogPostsRouter.put("/:id", (req,res,next) => {
+blogPostsRouter.put("/:id", async (req,res,next) => {
   try {
     // Get all blogPosts
-    const blogPosts = getBlogPosts();
+    const blogPosts = await getBlogPosts();
 
     // Find index of a blogPost within blogPosts
     const index = blogPosts.findIndex(blogPost => blogPost._id === req.params.id);
@@ -126,7 +226,7 @@ blogPostsRouter.put("/:id", (req,res,next) => {
     blogPosts[index] = editedBlogPost;
     
     // Overwrite blogPosts.json
-    writeBlogPosts(blogPosts);
+    await writeBlogPosts(blogPosts);
 
     // Send response
     res.status(200).send(editedBlogPost);
@@ -139,16 +239,16 @@ blogPostsRouter.put("/:id", (req,res,next) => {
 
 
 // DELETE /blogPosts/:id
-blogPostsRouter.delete("/:id", (req,res,next) => {
+blogPostsRouter.delete("/:id", async (req,res,next) => {
   try {
     // Get all blogPosts
-    const blogPosts = getBlogPosts();
+    const blogPosts = await getBlogPosts();
 
     // Filter out the blogPost by id from other blogPosts
     const currentBlogPosts = blogPosts.filter(blogPost => blogPost._id !== req.params.id);
 
     // Overwrite existing blogPosts.json
-    writeBlogPosts(currentBlogPosts);
+    await writeBlogPosts(currentBlogPosts);
 
     // Send response
     res.status(204).send();
