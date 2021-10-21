@@ -11,6 +11,7 @@ const blogImgFolderPath = join(process.cwd(), "./public/img/blogPosts");
 
 // Folder paths for JSON files
 const dataFolderPath = join(dirname(fileURLToPath(import.meta.url)), "../data");
+console.log(dataFolderPath);
 const authorsJSONPath = join(dataFolderPath, "authors.json");
 const blogPostsJSONPath = join(dataFolderPath, "blogPosts.json");
 const blogPostCommentsJSONPath = join(dataFolderPath, "blogPostComments.json");

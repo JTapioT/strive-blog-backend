@@ -1,5 +1,4 @@
 import express from "express";
-import fs from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import uniqid from 'uniqid';
@@ -17,28 +16,20 @@ const parentFolderPath = dirname(currentFilePath); // Parent folder path
 const blogPostsJSONPath = join(parentFolderPath, "../../data/blogPosts.json");
 // Concise way:
 // const blogPostsJSONPath = join(dirname(fileURLToPath(import.meta.url)), "../../data/blogPosts.json")
-
 // join(dirname(fileURLToPath(import.meta.url)), "../data")
 
-// Read from blogPosts.json the blogPosts.
-/* function getBlogPosts() {
-  return JSON.parse(fs.readFileSync(blogPostsJSONPath))
-}
-// Overwrite the blogPosts.json.
-function writeBlogPosts(content) {
-  fs.writeFileSync(blogPostsJSONPath, JSON.stringify(content));
-} */
+
 
 // Router
 const blogPostsRouter = express.Router();
 
 
 // GET /blogPosts
-blogPostsRouter.get("/", (req,res, next) => {
+blogPostsRouter.get("/", async (req,res, next) => {
   try {
 
     // Get all blog posts
-    const blogPosts = getBlogPosts();
+    const blogPosts = await getBlogPosts();
 
     // Handle also possible situation where we don't have any blog posts??
     if(!blogPosts.length) {
