@@ -5,6 +5,7 @@ import { dirname, join } from 'path';
 import uniqid from 'uniqid';
 import createHttpError from "http-errors";
 import { validationResult } from "express-validator";
+import { authorValidationMiddlewares } from '../../validation.js';
 
 
 const authorsRouter = express.Router();
@@ -75,7 +76,7 @@ authorsRouter.get("/:id", (req,res) => {
 
 // Create a new author - POST
 // Should here happen the validation that req.body has information what is needed?? - Reject if body does not contain necessary info etc..?
-authorsRouter.post("/", (req,res) => {
+authorsRouter.post("/", authorValidationMiddlewares, (req,res) => {
 
   try {
     // Read authors.json

@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import uniqid from 'uniqid';
 import createHttpError from "http-errors";
-import { blogPostValidationMiddlewares } from "./validation.js";
+import { blogPostValidationMiddlewares } from "../../validation.js";
 import { validationResult } from "express-validator";
 
 

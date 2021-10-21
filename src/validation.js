@@ -3,12 +3,13 @@ import { body } from 'express-validator';
 
 
 export const authorValidationMiddlewares = [
-
+  body("name").exists().isString().withMessage("First name is mandatory field"),
+  body("surname").exists().isString().withMessage("Surname is mandatory field"),
+  body("email").exists().isEmail().withMessage("Email is mandatory"),
+  body("dateOfBirth").exists().isISO8601().withMessage("Date of birth is mandatory field, YYYY-MM-DD format"),
+  body("avatar").exists().isURL().withMessage("Avatar link is mandatory")
 ]
 
-// How to continue the check of Object entries and their values?
-// Validate within Author that name is string, avatar is an URL.
-// Validate within readTime that value is numeric and unit is 'minute' and nothing else??
 
 export const blogPostValidationMiddlewares = [
   body("category")
@@ -23,15 +24,21 @@ export const blogPostValidationMiddlewares = [
     .isObject(),
   body("readTime.value")
     .exists()
-    .isNumeric()
+    .isInt()
     .withMessage("Readtime value is mandatory field"),
   body("readTime.unit")
     .exists()
     .isString()
     .withMessage("Readtime unit is mandatory field"),
   body("author").exists().isObject().withMessage("Author is mandatory field"),
-  body("author.name").exists().isString().withMessage("Author name is mandatory"),
-  body("author.avatar").exists().isURL().withMessage("Author avatar is mandatory field"),
+  body("author.name")
+  .exists()
+  .isString()
+  .withMessage("Author name is mandatory"),
+  body("author.avatar")
+  .exists()
+  .isURL()
+  .withMessage("Author avatar is mandatory field"),
   body("content").exists().isString().withMessage("Content is mandatory field"),
 ];
 
