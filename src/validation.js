@@ -2,7 +2,7 @@ import { body } from 'express-validator';
 
 
 
-export const authorValidationMiddlewares = [
+export const authorPostValidation = [
   body("name").exists().isString().withMessage("First name is mandatory field"),
   body("surname").exists().isString().withMessage("Surname is mandatory field"),
   body("email").exists().isEmail().withMessage("Email is mandatory"),
@@ -22,7 +22,7 @@ avatar (e.g. https://ui-avatars.com/api/?name=John+Doe)
 
 
 
-export const blogPostValidationMiddlewares = [
+export const blogPostValidation = [
   body("category")
     .exists()
     .isString()
