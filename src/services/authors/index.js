@@ -1,7 +1,7 @@
 import express, { response } from 'express';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname, join, extname } from 'path';
 import uniqid from 'uniqid';
 import createHttpError from "http-errors";
 import { validationResult } from "express-validator";
@@ -80,26 +80,31 @@ authorsRouter.get("/:id", (req,res, next) => {
 authorsRouter.post("/", authorValidationMiddlewares, (req,res, next) => {
 
   try {
+    // Handle validationResult accordingly
+    const errorsList = validationResult(req);
+    if (!errorsList.isEmpty()) {
+      next(createHttpError(400, { errorsList }));
+    }
+
     // Read authors.json
     const authors = getAuthors();
-  
+
     // Create new author - add random id
     let newAuthor = {
       ...req.body,
       id: uniqid(),
       avatar: `http://localhost:3001/public/avatarImages/${id}`,
-      createdAt: new Date()
+      createdAt: new Date(),
     };
-  
+
     // Push new author to existing authors array
     authors.push(newAuthor);
 
     // Overwrite existing authors.json
     writeAuthors(authors);
-  
+
     // Send response
-    res.status(201).send({id: newAuthor.id});
-    
+    res.status(201).send({ id: newAuthor.id });
   } catch (error) {
     next(error);
   }
@@ -109,9 +114,10 @@ authorsRouter.post("/", authorValidationMiddlewares, (req,res, next) => {
 authorsRouter.post("/:id/uploadAvatar", multer().single("avatar"), async (req, res, next) => {
   try {
     // Slice out the file-extension part to add it concatenated with id:
-    const fileExtension = req.file.originalname.slice(
+    /*  const fileExtension = req.file.originalname.slice(
       req.file.originalname.indexOf(".")
-    );
+    ); */
+    const fileExtension = extname(req.file.originalname);
     const fileName = `${req.params.id}${fileExtension}`
     //console.log(fileName);
 

@@ -8,7 +8,18 @@ export const authorValidationMiddlewares = [
   body("email").exists().isEmail().withMessage("Email is mandatory"),
   body("dateOfBirth").exists().isISO8601().withMessage("Date of birth is mandatory field, YYYY-MM-DD format"),
   body("avatar").exists().isURL().withMessage("Avatar link is mandatory")
-]
+];
+
+/* 
+name
+surname
+ID (Unique and server-generated)
+email
+date of birth
+avatar (e.g. https://ui-avatars.com/api/?name=John+Doe)
+*/
+
+
 
 
 export const blogPostValidationMiddlewares = [
@@ -17,7 +28,7 @@ export const blogPostValidationMiddlewares = [
     .isString()
     .withMessage("Category is mandatory field"),
   body("title").exists().isString().withMessage("Title is mandatory field"),
-  body("cover").exists().isURL().withMessage("Cover is mandatory field"),
+  body("cover").optional().exists().isURL().withMessage("Cover is mandatory field"),
   body("readTime")
     .exists()
     .withMessage("Read time is mandatory field")

@@ -1,6 +1,6 @@
 import express from "express";
 import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { dirname, join, extname } from "path";
 import uniqid from 'uniqid';
 import createHttpError from "http-errors";
 import { blogPostValidationMiddlewares } from "../../validation.js";
@@ -89,7 +89,7 @@ blogPostsRouter.get("/:id/comments", async (req,res,next) => {
 })
 
 
-// POST :id/comments 
+// POST /blogPosts/:id/comments 
 blogPostsRouter.post("/:id/comments", async (req,res,next) => {
   try {
     // Get all blog posts
@@ -106,7 +106,7 @@ blogPostsRouter.post("/:id/comments", async (req,res,next) => {
       // Edit comments array:
       let editedBlogPostComments = [
         ...blogPost.comments,
-        { name: req.body.name, message: req.body.message },
+        { id: uniqid(), name: req.body.name, message: req.body.message },
       ];
       // Overwrite existing comments array of blog post:
       blogPost.comments = editedBlogPostComments;
@@ -128,8 +128,45 @@ blogPostsRouter.post("/:id/comments", async (req,res,next) => {
   } catch (error) {
     next(error);
   }
-  
 })
+
+// DELETE /blogPosts/:id/comments/:commentId
+blogPostsRouter.delete("/:id/comments/:commentId", async (req, res, next) =>{
+  try {
+    // Get all blog posts
+    const blogPosts = await getBlogPosts();
+  
+    // Blog post by id:
+    const blogPost = blogPosts.find((blogPost) => blogPost._id === req.params.id);
+  
+    if (blogPost) {
+      // Filter
+      let currentComments = blogPost.comments.filter(comment => comment.id !== req.params.commentId);
+
+      console.log(currentComments);
+  
+      // Overwrite existing comments array of blog post:
+      blogPost.comments = currentComments;
+  
+      let index = blogPosts.findIndex(
+        (blogPost) => blogPost._id === req.params.id
+      );
+      // Overwrite existing blogPost
+      blogPosts[index] = blogPost;
+      // Overwrite blogPosts.json
+      await writeBlogPosts(blogPosts);
+  
+      res.status(204).send();
+    } else {
+      next(
+        createHttpError(404, `No blog post found with an id:${req.params.id}`)
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+})
+
 
 
 // POST /blogPosts
@@ -173,9 +210,10 @@ blogPostsRouter.post("/", blogPostValidationMiddlewares, async (req, res, next) 
 blogPostsRouter.post("/:id/uploadCover", multer().single("coverPhoto"), async (req,res,next) => {
   try {
     // Slice out the file-extension part to add it concatenated with id:
-    const fileExtension = req.file.originalname.slice(
+    /* req.file.originalname.slice(
       req.file.originalname.indexOf(".")
-    );
+    ); <== DO NOT USE THIS!!*/
+    const fileExtension = extname(req.file.originalname);
     const fileName = `${req.params.id}${fileExtension}`;
     //console.log(fileName);
 

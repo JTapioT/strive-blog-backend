@@ -14,7 +14,6 @@ const dataFolderPath = join(dirname(fileURLToPath(import.meta.url)), "../data");
 console.log(dataFolderPath);
 const authorsJSONPath = join(dataFolderPath, "authors.json");
 const blogPostsJSONPath = join(dataFolderPath, "blogPosts.json");
-const blogPostCommentsJSONPath = join(dataFolderPath, "blogPostComments.json");
 
 // Functions related to retrieving and writing JSON files from different paths
 
