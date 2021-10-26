@@ -7,7 +7,7 @@ import uniqid from "uniqid";
 export async function getAllPosts(req,res,next) {
   try {
     // Get all blog posts
-    const blogPosts = await getBlogPosts();
+    const blogPosts = await getBlogPostsJSON();
     
     // Handle also possible situation where we don't have any blog posts??
     if (!blogPosts.length) {
