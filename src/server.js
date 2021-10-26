@@ -20,12 +20,12 @@ const server = express();
 //server.use(express.static(publicFolderPath));
 const whitelist = [process.env.REACT_APP_FE_PROD_URL]
 const corsOptions = {
-  origin: function (origin, cb) {
+  origin: function (origin, callback) {
     console.log("Current origin: ", origin);
     if (!origin || whitelist.includes(origin)) {
-      next(null, true);
+      callback(null, true);
     } else {
-      throw new Error({ status: 500, message: "CORS ERROR" });
+      callback(new Error({ status: 500, message: "CORS ERROR" }));
     }
   },
 };
