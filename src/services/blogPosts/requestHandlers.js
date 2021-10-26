@@ -198,6 +198,8 @@ export async function uploadBlogPostCoverImg(req,res,next) {
     
     blogPosts[index] = editedBlogPost;
     await writeBlogPostsJSON(blogPosts);
+
+    console.log(req.path);
     
     res.status(201).send({ status: "success" });
   } catch (error) {
