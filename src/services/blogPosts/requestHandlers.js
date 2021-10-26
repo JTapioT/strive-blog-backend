@@ -209,7 +209,7 @@ export async function uploadBlogPostCoverImg(req,res,next) {
   }
 }
 
-export async function updateBlogPost(req,rex,next) {
+export async function updateBlogPost(req,res,next) {
   try {
     // Get all blogPosts
     const blogPosts = await getBlogPostsJSON();
