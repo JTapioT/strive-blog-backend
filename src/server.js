@@ -17,7 +17,7 @@ const server = express();
 
 // Global middleware
 //server.use(express.static(publicFolderPath));
-const whitelist = [process.env.REACT_APP_FE_PROD_URL]
+const whitelist = [process.env.FE_LOCAL_URL, process.env.REACT_APP_FE_PROD_URL]
 const corsOptions = {
   origin: function (origin, callback) {
     console.log("Current origin: ", origin);

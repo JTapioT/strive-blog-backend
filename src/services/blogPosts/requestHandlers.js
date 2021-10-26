@@ -110,7 +110,7 @@ export async function getPostComments(req,res,next) {
   }
 }
 
-export async function postComment(req,res,next) {
+export async function addComment(req,res,next) {
   try {
     // Get all blog posts
     const blogPosts = await getBlogPostsJSON();

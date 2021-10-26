@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { blogPostValidation } from "../../validation.js";
-import { deletePostComment, getAllPosts, getPostById, getPostComments, postComment, updateBlogPost, uploadBlogPostCoverImg, deleteBlogPost, postBlogPost } from "./requestHandlers.js";
+import { deletePostComment, getAllPosts, getPostById, getPostComments, addComment, updateBlogPost, uploadBlogPostCoverImg, deleteBlogPost, postBlogPost } from "./requestHandlers.js";
 //import { singleFileHandler } from "./middleware.js";
 /* import {CloudinaryStorage} from "multer-storage-cloudinary";
 import {v2 as cloudinary} from "cloudinary";
@@ -33,7 +33,7 @@ blogPostsRouter.get("/:id/comments", getPostComments)
 blogPostsRouter.post("/", blogPostValidation, postBlogPost);
 
 // POST /blogPosts/:id/comments 
-blogPostsRouter.post("/:id/comments", postComment)
+blogPostsRouter.post("/:id/comments", addComment)
 
 // POST /blogPosts/:id/uploadCover
 blogPostsRouter.post("/:id/uploadCover", multer({storage: cloudinaryStorage}).single("coverPhoto"), uploadBlogPostCoverImg);
