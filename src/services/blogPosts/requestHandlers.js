@@ -193,13 +193,14 @@ export async function uploadBlogPostCoverImg(req,res,next) {
     
     let editedBlogPost = {
       ...blogPosts[index],
-      cover: req.path,
+      cover: req.file.path,
     };
     
     blogPosts[index] = editedBlogPost;
     await writeBlogPostsJSON(blogPosts);
 
-    console.log(req.path);
+    console.log("HERE IS THE FILE PATH")
+    console.log(req.file.path);
     
     res.status(201).send({ status: "success" });
   } catch (error) {
