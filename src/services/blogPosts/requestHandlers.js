@@ -4,6 +4,7 @@ import { extname } from "path";
 import createHttpError from "http-errors";
 import uniqid from "uniqid";
 
+
 export async function getAllPosts(req,res,next) {
   try {
     // Get all blog posts
@@ -180,25 +181,25 @@ export async function deletePostComment(req,res,next) {
 
 export async function uploadBlogPostCoverImg(req,res,next) {
   try {
-    const fileExtension = extname(req.file.originalname);
-    const fileName = `${req.params.id}${fileExtension}`;
+    //const fileExtension = extname(req.file.originalname);
+    //const fileName = `${req.params.id}${fileExtension}`;
     //console.log(fileName);
   
-    await saveCoverImages(fileName, req.file.buffer);
-    res.status(201).send({ status: "success" });
-  
+    //await saveCoverImages(fileName, req.file.buffer);
+    
     // Update blogPost cover accordingly:
     let blogPosts = await getBlogPostsJSON();
     let index = blogPosts.findIndex((blogPost) => blogPost._id === req.params.id);
-  
+    
     let editedBlogPost = {
       ...blogPosts[index],
-      cover: `http://localhost:3001/blogImages/${fileName}`,
+      cover: req.path,
     };
-  
+    
     blogPosts[index] = editedBlogPost;
-  
     await writeBlogPostsJSON(blogPosts);
+    
+    res.status(201).send({ status: "success" });
   } catch (error) {
     console.log(error);
     next(error);

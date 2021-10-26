@@ -3,7 +3,15 @@ import multer from "multer";
 import { blogPostValidation } from "../../validation.js";
 import { deletePostComment, getAllPosts, getPostById, getPostComments, postComment, updateBlogPost, uploadBlogPostCoverImg, deleteBlogPost, postBlogPost } from "./requestHandlers.js";
 //import { singleFileHandler } from "./middleware.js";
+import {CloudinaryStorage} from "multer-storage-cloudinary";
+import {v2 as cloudinary} from "cloudinary";
 
+const cloudinaryStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "strive-blog",
+  },
+});
 
 
 // Router
@@ -25,7 +33,7 @@ blogPostsRouter.post("/", blogPostValidation, postBlogPost);
 blogPostsRouter.post("/:id/comments", postComment)
 
 // POST /blogPosts/:id/uploadCover
-blogPostsRouter.post("/:id/uploadCover", multer().single("coverPhoto"), uploadBlogPostCoverImg);
+blogPostsRouter.post("/:id/uploadCover", multer({storage: cloudinaryStorage}).single("coverPhoto"), uploadBlogPostCoverImg);
 
 // PUT /blogPosts/:id
 blogPostsRouter.put("/:id", updateBlogPost);

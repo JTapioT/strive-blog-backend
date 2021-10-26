@@ -5,7 +5,6 @@ import authorsRouter from './services/authors/index.js';
 import blogPostsRouter from './services/blogPosts/index.js';
 import { badRequestHandler, notFoundHandler, genericErrorHandler } from './errorHandlers.js';
 
-
 //import {join} from 'path';
 
 // Public folder path - static files
