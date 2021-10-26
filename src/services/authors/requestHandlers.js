@@ -1,4 +1,4 @@
-import {getAuthorsJSON, writeAuthorsJSON, saveAvatarImages} from "../../lib/fs-tools.js";
+import {getAuthorsJSON, writeAuthorsJSON, saveAvatarImages, getBlogPostsJSON} from "../../lib/fs-tools.js";
 import createHttpError from "http-errors";
 import { validationResult } from "express-validator";
 import uniqid from "uniqid";
@@ -39,6 +39,31 @@ export async function getAuthorById(req,res,next) {
       res.send(author);
     }
   } catch (error) {
+    next(error);
+  }
+}
+
+export async function getAuthorBlogPosts(req,res,next) {
+  try {
+    // Read authors.json
+    const authors = getAuthorsJSON();
+  
+    // Find author from authors by id which is provided with request params
+    const author = authors.find(
+      (author) => author.id === parseInt(req.params.id)
+    );
+  
+    // Handle non-existing author by requested id
+    if (!author) {
+      next(createHttpError(404, `No author found with an id: ${req.params.id}`));
+    } else {
+      // Filter blogPosts by author name? 
+      const blogPosts = getBlogPostsJSON();
+      const postsByAuthor = blogPosts.filter(blogPost => blogPost.author.name === author.name);
+      res.send(postsByAuthor);
+    }
+
+  } catch(error) {
     next(error);
   }
 }

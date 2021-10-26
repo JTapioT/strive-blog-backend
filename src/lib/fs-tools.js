@@ -1,6 +1,15 @@
 import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import { v2 as cloudinary } from "cloudinary";
+
+export const cloudinaryStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "strive-blog",
+  },
+});
 
 const { readJSON, writeJSON, writeFile } = fs; 
 

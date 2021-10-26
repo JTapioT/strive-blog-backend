@@ -3,7 +3,7 @@ import multer from "multer";
 import { blogPostValidation } from "../../validation.js";
 import { deletePostComment, getAllPosts, getPostById, getPostComments, postComment, updateBlogPost, uploadBlogPostCoverImg, deleteBlogPost, postBlogPost } from "./requestHandlers.js";
 //import { singleFileHandler } from "./middleware.js";
-import {CloudinaryStorage} from "multer-storage-cloudinary";
+/* import {CloudinaryStorage} from "multer-storage-cloudinary";
 import {v2 as cloudinary} from "cloudinary";
 
 const cloudinaryStorage = new CloudinaryStorage({
@@ -12,7 +12,9 @@ const cloudinaryStorage = new CloudinaryStorage({
     folder: "strive-blog",
   },
 });
+ */
 
+import { cloudinaryStorage } from "../../lib/fs-tools.js";
 
 // Router
 const blogPostsRouter = express.Router();
@@ -22,6 +24,7 @@ blogPostsRouter.get("/", getAllPosts);
 
 // GET /blogPosts/:id
 blogPostsRouter.get("/:id", getPostById);
+
 
 // GET /blogPosts/:id/comments
 blogPostsRouter.get("/:id/comments", getPostComments)

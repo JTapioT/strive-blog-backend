@@ -1,7 +1,7 @@
 import express from 'express';
 import { authorPostValidation } from '../../validation.js';
 import multer from 'multer';
-import { getAuthors, getAuthorById, uploadAvatarImage, checkForAlreadyExistingEmail, newAuthor, editAuthor, deleteAuthor } from './requestHandlers.js';
+import { getAuthors, getAuthorById, uploadAvatarImage, checkForAlreadyExistingEmail, newAuthor, editAuthor, deleteAuthor, getAuthorBlogPosts } from './requestHandlers.js';
 
 // Router
 const authorsRouter = express.Router();
@@ -11,6 +11,9 @@ authorsRouter.get("/", getAuthors);
 
 // Return a single author by id - GET
 authorsRouter.get("/:id", getAuthorById);
+
+// Return blog posts by certain author - GET
+authorsRouter.get("/:id/blogPosts", getAuthorBlogPosts);
 
 // Create a new author - POST
 authorsRouter.post("/", authorPostValidation, newAuthor)

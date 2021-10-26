@@ -14,8 +14,15 @@ export async function getAllPosts(req,res,next) {
     if (!blogPosts.length) {
       next(createHttpError(404, "No blog posts to show."));
     } else {
-      // Send response
-      res.send(blogPosts);
+      if(req.query.title) {
+        // Filter by title - maybe later add for author name etc.
+        const filteredBlogPosts = blogPosts.filter(blogPost => blogPost.title.toLowerCase().includes(req.query.title));
+        res.send(filteredBlogPosts);
+      } else {
+        // Send response
+        res.send(blogPosts);
+      }
+
     }
   } catch (error) {
     console.log(error);
