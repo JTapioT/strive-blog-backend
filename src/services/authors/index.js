@@ -1,7 +1,7 @@
 import express from 'express';
-import { authorValidationMiddlewares } from '../../validation.js';
+import { authorPostValidation } from '../../validation.js';
 import multer from 'multer';
-import { getAuthors, getAuthorById, uploadAvatarImage, checkForAlreadyExistingEmail, editAuthor } from './requestHandlers.js';
+import { getAuthors, getAuthorById, uploadAvatarImage, checkForAlreadyExistingEmail, newAuthor, editAuthor, deleteAuthor } from './requestHandlers.js';
 
 // Router
 const authorsRouter = express.Router();
@@ -13,7 +13,7 @@ authorsRouter.get("/", getAuthors);
 authorsRouter.get("/:id", getAuthorById);
 
 // Create a new author - POST
-authorsRouter.post("/", authorValidationMiddlewares, newAuthor)
+authorsRouter.post("/", authorPostValidation, newAuthor)
 
 // Upload author avatar image - POST
 authorsRouter.post("/:id/uploadAvatar", multer().single("avatar"), uploadAvatarImage)

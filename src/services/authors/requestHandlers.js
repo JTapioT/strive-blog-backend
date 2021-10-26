@@ -2,7 +2,7 @@ import {getAuthorsJSON, writeAuthorsJSON, saveAvatarImages} from "../../lib/fs-t
 import createHttpError from "http-errors";
 import { validationResult } from "express-validator";
 import uniqid from "uniqid";
-import { extname } from 'fs';
+import { extname } from "path";
 
 export async function getAuthors(req,res,next) {
     try {
