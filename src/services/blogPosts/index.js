@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { blogPostValidation } from "../../validation.js";
-import { deletePostComment, getAllPosts, getPostById, getPostComments, addComment, updateBlogPost, uploadBlogPostCoverImg, deleteBlogPost, postBlogPost } from "./requestHandlers.js";
+import { deletePostComment, getAllPosts, getPostById, getPostComments, addComment, updateBlogPost, uploadBlogPostCoverImg, deleteBlogPost, postBlogPost, downloadPDF } from "./requestHandlers.js";
 //import { singleFileHandler } from "./middleware.js";
 /* import {CloudinaryStorage} from "multer-storage-cloudinary";
 import {v2 as cloudinary} from "cloudinary";
