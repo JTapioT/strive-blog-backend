@@ -77,9 +77,10 @@ export async function downloadPDF(req,res,next) {
           response.headers["content-type"] +
           ";base64," +
           Buffer.from(body).toString("base64");
-          console.log(imageFile);
       }
     });
+
+    console.log(imageFile);
 
 
     // Provide for getPDFReadableStream the content to format into pdf:
