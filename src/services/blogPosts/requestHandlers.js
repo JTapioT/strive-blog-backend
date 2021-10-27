@@ -69,10 +69,12 @@ export async function downloadPDF(req,res,next) {
       `Read time: ${blogPost.readTime.value} ${blogPost.readTime.unit}`,
       `Author - ${blogPost.author.name}`, 
       blogPost.content, 
-      `Blog post written: ${blogPost.createdAt}`];
+      `Blog post written: ${blogPost.createdAt.slice(0,10)}`];
 
     const source = getPDFReadableStream(data);
     const destination = res;
+
+    
 
     pipeline(source, destination, (error) => {
       if (error) {
