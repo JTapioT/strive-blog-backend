@@ -74,7 +74,7 @@ export async function downloadPDF(req,res,next) {
     const source = getPDFReadableStream(data);
     const destination = res;
 
-    pipeline(source, transform, destination, (error) => {
+    pipeline(source, destination, (error) => {
       if (error) {
         next(error);}
     });
