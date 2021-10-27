@@ -6,6 +6,7 @@ import uniqid from "uniqid";
 import { pipeline } from "stream";
 import getPDFReadableStream from "../../lib/pdf-tools.js";
 import request from "request";
+import { Buffer } from 'buffer';
 
 
 export async function getAllPosts(req,res,next) {
@@ -66,15 +67,19 @@ export async function downloadPDF(req,res,next) {
 
     // Read image url - turn to base64 string:
     let imageFile;
-    request.get(blogPost.cover)
-    .on('response', function (response) {
-      imageFile = response.file;
-    })
-    .on('end', () => {
-      console.log("image downloaded: ", imageFile);
+    request.defaults({encoding: null})
+    request.get(blogPost.cover, function (err, response, body) {
+      if(err) {
+        console.log(er)
+      } else {
+        imageFile =
+          "data:" +
+          response.headers["content-type"] +
+          ";base64," +
+          Buffer.from(body).toString("base64");
+          console.log(imageFile);
+      }
     });
-
-    
 
 
     // Provide for getPDFReadableStream the content to format into pdf:
@@ -87,8 +92,6 @@ export async function downloadPDF(req,res,next) {
 
     const source = getPDFReadableStream(data);
     const destination = res;
-
-    
 
     pipeline(source, destination, (error) => {
       if (error) {
