@@ -65,22 +65,43 @@ export async function downloadPDF(req,res,next) {
     const blogPosts = await getBlogPostsJSON()
     const blogPost = blogPosts.find((blogPost) => blogPost._id === req.params.id);
 
+    const imageToBase64 = new Promise((resolve, reject) => {
+      let imageFile;
+      request.defaults({ encoding: null });
+      request.get(blogPost.cover, function (err, response, body) {
+        if (err) {
+          reject(err);
+        } else {
+          imageFile =
+            "data:" +
+            response.headers["content-type"] +
+            ";base64," +
+            Buffer.from(body).toString("base64");
+        }
+      }).on('end', () => {
+        resolve(imageFile);
+      })
+    })
+
+    let image = await imageToBase64;
+    console.log(image);
     // Read image url - turn to base64 string:
-    let imageFile;
+/*     let imageFile;
     request.defaults({encoding: null})
     request.get(blogPost.cover, function (err, response, body) {
       if(err) {
         console.log(er)
       } else {
-        imageFile =
+        imageFile = 
           "data:" +
           response.headers["content-type"] +
           ";base64," +
           Buffer.from(body).toString("base64");
       }
-    });
+    }); */
 
-    console.log(imageFile);
+    // Maybe wrap this into promise and then use this base64 image file within the data array?
+
 
 
     // Provide for getPDFReadableStream the content to format into pdf:
