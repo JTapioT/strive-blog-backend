@@ -68,25 +68,41 @@ export async function downloadPDF(req,res,next) {
     // From the homework solution:
     let blogPostImage;
     if(blogPost.cover) {
+      // Example url from cloudinary:
+      /* 
+      https://res.cloudinary.com/dmhtbvfbg/image/upload/v123456789/strive-blog/loremipsumlorem.png 
+      */
+
+      // I guess with responseType - expect response in arraybuffer(?):
       const response = await axios.get(blogPost.cover, {
         responseType: "arraybuffer",
       })
+      // Split url to parts, where "/" is found:
       const blogCoverURLParts = blogPost.cover.split("/");
+      // From blogCoverURLParts array, 
+      // the fileName would be loremipsumlorem.png:
       const fileName = blogCoverURLParts[blogCoverURLParts.length - 1];
-      const [extension] = fileName.split(".");
+      // Latter part gives the extension name:
+      //const [id,extension] = fileName.split(".");
+      // Just my own try with slice..
+      const extension = fileName.slice(fileName.indexOf(".")+1);
+      // Data(binary?) is transformed into string format and encoding is base64?
       const base64 = response.data.toString("base64");
+      // Finally, base64 image contains: MIME-type;base64;base64 encoded string?
       const base64image = `data:image/${extension};base64,${base64}`;
+      // Set as an object, as image needs to be included within object:
       blogPostImage = {image: base64image, width: 500};
     }
 
     // Provide for getPDFReadableStream the content to format into pdf:
+    // TODO: find out later how to center text?
     const content = [
       blogPostImage,
       {text: blogPost.title, fontSize: 20, bold: true, margin: [0,0,0,40]},
-      {text: `Read time: ${blogPost.readTime.value} ${blogPost.readTime.unit}`},
+      {text: striptags(blogPost.content), lineHeight: 4}, 
       {text: `Author - ${blogPost.author.name}`}, 
-      {text: striptags(blogPost.content), lineHeight: 2}, 
-      {text: `Blog post written: ${blogPost.createdAt.slice(0,10)}`}
+      {text: `Read time: ${blogPost.readTime.value} ${blogPost.readTime.unit}`},
+      {text: `Date: ${blogPost.createdAt.slice(0,10)}`}
     ];
 
     const source = getPDFReadableStream(content);
