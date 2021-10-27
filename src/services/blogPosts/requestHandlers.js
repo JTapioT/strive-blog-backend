@@ -57,7 +57,7 @@ export async function getPostById(req,res,next) {
 
 export async function downloadPDF(req,res,next) {
   try {
-    res.setHeader(`Content-Disposition", "attachment; filename=Blog_${req.params.id}.pdf`);
+    res.setHeader(`Content-Disposition, attachment; filename=Blog_${req.params.id}.pdf`);
 
     // Fetch blog information
     const blogPosts = await getBlogPostsJSON()
