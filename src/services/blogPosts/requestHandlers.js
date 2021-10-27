@@ -3,6 +3,8 @@ import {validationResult} from "express-validator";
 import { extname } from "path";
 import createHttpError from "http-errors";
 import uniqid from "uniqid";
+import { pipeline } from "stream";
+import getPDFReadableStream from "../../lib/pdf-tools.js";
 
 
 export async function getAllPosts(req,res,next) {
@@ -49,6 +51,35 @@ export async function getPostById(req,res,next) {
     }
   } catch (error) {
     console.log(error);
+    next(error);
+  }
+}
+
+export async function downloadPDF(req,res,next) {
+  try {
+    res.setHeader(`Content-Disposition", "attachment; filename=Blog_${req.params.id}.pdf`);
+
+    // Fetch blog information
+    const blogPosts = await getBlogPostsJSON()
+    const blogPost = blogPosts.find((blogPost) => blogPost._id === req.params.id);
+    
+    // Provide for getPDFReadableStream the content to format into pdf:
+    const data = [
+      blogPost.title,
+      `Read time: ${blogPost.readTime.value} ${blogPost.readTime.unit}`,
+      `Author - ${blogPost.author.name}`, 
+      blogPost.content, 
+      `Blog post written: ${blogPost.createdAt}`];
+
+    const source = getPDFReadableStream(data);
+    const destination = res;
+
+    pipeline(source, transform, destination, (error) => {
+      if (error) {
+        next(error);}
+    });
+
+  } catch (error) {
     next(error);
   }
 }
