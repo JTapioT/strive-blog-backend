@@ -65,14 +65,16 @@ export async function downloadPDF(req,res,next) {
     const blogPost = blogPosts.find((blogPost) => blogPost._id === req.params.id);
 
     // Read image url - turn to base64 string:
-    let imageFile = "";
+    let imageFile;
     request.get(blogPost.cover)
-    .on('data', function chunkOfData(chunk) {
-      imageFile += chunk;
+    .on('response', function (response) {
+      imageFile = response.body.toString("base64");
     })
     .on('end', () => {
-      console.log(imageFile);
+      console.log("image downloaded: ", imageFile);
     });
+
+    
 
 
     // Provide for getPDFReadableStream the content to format into pdf:
