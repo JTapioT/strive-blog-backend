@@ -6,6 +6,7 @@ import uniqid from "uniqid";
 import { pipeline } from "stream";
 import getPDFReadableStream from "../../lib/pdf-tools.js";
 import axios from "axios";
+import striptags from "striptags";
 
 
 export async function getAllPosts(req,res,next) {
@@ -72,19 +73,21 @@ export async function downloadPDF(req,res,next) {
       })
       const blogCoverURLParts = blogPost.cover.split("/");
       const fileName = blogCoverURLParts[blogCoverURLParts.length - 1];
-      const [id, extension] = fileName.split(".");
+      const [extension] = fileName.split(".");
+      const base64 = response.data.toString("base64");
       const base64image = `data:image/${extension};base64,${base64}`;
-      blogPostImage.image = base64image;
+      blogPostImage = {image: base64image, width: 500};
     }
 
     // Provide for getPDFReadableStream the content to format into pdf:
     const content = [
       blogPostImage,
-      blogPost.title,
-      `Read time: ${blogPost.readTime.value} ${blogPost.readTime.unit}`,
-      `Author - ${blogPost.author.name}`, 
-      blogPost.content, 
-      `Blog post written: ${blogPost.createdAt.slice(0,10)}`];
+      {text: blogPost.title, fontSize: 20, bold: true, margin: [0,0,0,40]},
+      {text: `Read time: ${blogPost.readTime.value} ${blogPost.readTime.unit}`},
+      {text: `Author - ${blogPost.author.name}`}, 
+      {text: striptags(blogPost.content), lineHeight: 2}, 
+      {text: `Blog post written: ${blogPost.createdAt.slice(0,10)}`}
+    ];
 
     const source = getPDFReadableStream(content);
     const destination = res;

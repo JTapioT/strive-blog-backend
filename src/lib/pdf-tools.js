@@ -18,9 +18,9 @@ function getPDFReadableStream(data) {
     }
   }
 
-  const options = {}
+  //const options = {}
 
-  const pdfReadableStream = printer.createPdfKitDocument(docDefinition, options);
+  const pdfReadableStream = printer.createPdfKitDocument(docDefinition);
 
   pdfReadableStream.end();
   return pdfReadableStream;
