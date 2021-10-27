@@ -5,7 +5,7 @@ import createHttpError from "http-errors";
 import uniqid from "uniqid";
 import { pipeline } from "stream";
 import getPDFReadableStream from "../../lib/pdf-tools.js";
-
+import axios from "axios";
 
 
 export async function getAllPosts(req,res,next) {
@@ -64,17 +64,29 @@ export async function downloadPDF(req,res,next) {
     const blogPosts = await getBlogPostsJSON()
     const blogPost = blogPosts.find((blogPost) => blogPost._id === req.params.id);
 
-    // TODO: Figure out the image to pdf.
+    // From the homework solution:
+    let blogPostImage = {};
+    if(blogPost.cover) {
+      const response = await axios.get(blogPost.cover, {
+        responseType: "arraybuffer",
+      })
+      const blogCoverURLParts = blogPost.cover.split("/");
+      const fileName = blogCoverURLParts[blogCoverURLParts.length - 1];
+      const [id, extension] = fileName.split(".");
+      const base64 = `data:image/${extension};base64,${base64}`;
+      blogPostImage = {image: base64image}
+    }
 
     // Provide for getPDFReadableStream the content to format into pdf:
-    const data = [
+    const content = [
+      blogPostImage,
       blogPost.title,
       `Read time: ${blogPost.readTime.value} ${blogPost.readTime.unit}`,
       `Author - ${blogPost.author.name}`, 
       blogPost.content, 
       `Blog post written: ${blogPost.createdAt.slice(0,10)}`];
 
-    const source = getPDFReadableStream(data);
+    const source = getPDFReadableStream(content);
     const destination = res;
 
     pipeline(source, destination, (error) => {
