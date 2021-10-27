@@ -68,7 +68,7 @@ export async function downloadPDF(req,res,next) {
     let imageFile;
     request.get(blogPost.cover)
     .on('response', function (response) {
-      imageFile = response.body.toString("base64");
+      imageFile = response.file;
     })
     .on('end', () => {
       console.log("image downloaded: ", imageFile);
