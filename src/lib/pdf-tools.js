@@ -3,9 +3,9 @@ import PdfPrinter from "pdfmake";
 
 function getPDFReadableStream(data) {
   const fonts = {
-    Helvetica: {
-      normal: "Helvetica",
-      bold: "Helvetica-Bold",
+    Arial: {
+      normal: "Arial",
+      bold: "Arial-Bold",
     },
   }
 
@@ -14,7 +14,7 @@ function getPDFReadableStream(data) {
   const docDefinition = {
     content: [...data],
     defaultStyle: {
-      font: "Helvetica"
+      font: "Arial"
     }
   }
 
