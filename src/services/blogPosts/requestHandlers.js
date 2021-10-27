@@ -79,6 +79,7 @@ export async function downloadPDF(req,res,next) {
             Buffer.from(body).toString("base64");
         }
       }).on('end', () => {
+        console.log("HELLO");
         resolve(imageFile);
       })
     })
