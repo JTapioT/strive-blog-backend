@@ -3,7 +3,7 @@ import PdfPrinter from "pdfmake";
 
 function getPDFReadableStream(data) {
   const fonts = {
-    Arial: {
+    Helvetica: {
       normal: "Helvetica",
       bold: "Helvetica-Bold",
     },

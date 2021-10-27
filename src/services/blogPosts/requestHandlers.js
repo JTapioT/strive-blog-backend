@@ -5,8 +5,7 @@ import createHttpError from "http-errors";
 import uniqid from "uniqid";
 import { pipeline } from "stream";
 import getPDFReadableStream from "../../lib/pdf-tools.js";
-import request from "request";
-import { Buffer } from 'buffer';
+
 
 
 export async function getAllPosts(req,res,next) {
@@ -66,7 +65,7 @@ export async function downloadPDF(req,res,next) {
     const blogPost = blogPosts.find((blogPost) => blogPost._id === req.params.id);
 
     // TODO: Figure out the image to pdf.
-    
+
     // Provide for getPDFReadableStream the content to format into pdf:
     const data = [
       blogPost.title,
