@@ -5,6 +5,7 @@ import createHttpError from "http-errors";
 import uniqid from "uniqid";
 import { pipeline } from "stream";
 import getPDFReadableStream from "../../lib/pdf-tools.js";
+import request from "request";
 
 
 export async function getAllPosts(req,res,next) {
@@ -62,6 +63,15 @@ export async function downloadPDF(req,res,next) {
     // Fetch blog information
     const blogPosts = await getBlogPostsJSON()
     const blogPost = blogPosts.find((blogPost) => blogPost._id === req.params.id);
+
+    // Read image url - turn to base64 string:
+    const url = blogPost.cover;
+    let imageFile;
+    request.get(url, (err, data) => {
+      imageFile = data;
+    })
+
+    console.log(imageFile);
     
     // Provide for getPDFReadableStream the content to format into pdf:
     const data = [
