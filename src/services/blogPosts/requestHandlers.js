@@ -6,7 +6,6 @@ import uniqid from "uniqid";
 import { pipeline } from "stream";
 import getPDFReadableStream from "../../lib/pdf-tools.js";
 import request from "request";
-import { fs } from "fs";
 
 
 export async function getAllPosts(req,res,next) {
@@ -75,7 +74,7 @@ export async function downloadPDF(req,res,next) {
       console.log(imageFile);
     });
 
-    
+
     // Provide for getPDFReadableStream the content to format into pdf:
     const data = [
       blogPost.title,
