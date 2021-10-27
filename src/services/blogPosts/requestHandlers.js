@@ -65,7 +65,7 @@ export async function downloadPDF(req,res,next) {
     const blogPost = blogPosts.find((blogPost) => blogPost._id === req.params.id);
 
     // From the homework solution:
-    let blogPostImage = {};
+    let blogPostImage;
     if(blogPost.cover) {
       const response = await axios.get(blogPost.cover, {
         responseType: "arraybuffer",
@@ -73,8 +73,8 @@ export async function downloadPDF(req,res,next) {
       const blogCoverURLParts = blogPost.cover.split("/");
       const fileName = blogCoverURLParts[blogCoverURLParts.length - 1];
       const [id, extension] = fileName.split(".");
-      const base64 = `data:image/${extension};base64,${base64}`;
-      blogPostImage = {image: base64image}
+      const base64image = `data:image/${extension};base64,${base64}`;
+      blogPostImage.image = base64image;
     }
 
     // Provide for getPDFReadableStream the content to format into pdf:
