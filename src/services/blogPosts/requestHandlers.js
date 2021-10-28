@@ -7,6 +7,8 @@ import { pipeline } from "stream";
 import getPDFReadableStream from "../../lib/pdf-tools.js";
 import axios from "axios";
 import striptags from "striptags";
+import sendAuthorEmail from "../../lib/email-tools.js";
+
 
 
 export async function getAllPosts(req,res,next) {
@@ -143,6 +145,9 @@ export async function postBlogPost(req,res,next) {
 
     // Overwrite the existing blogPosts.json()
     await writeBlogPostsJSON(blogPosts);
+
+    // Send author an email
+    await sendAuthorEmail(req.body.email);
 
     // Send response
     res.status(201).send({ _id: newBlogPost._id });
