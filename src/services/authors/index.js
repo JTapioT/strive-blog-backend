@@ -1,13 +1,16 @@
 import express from 'express';
 import { authorPostValidation } from '../../validation.js';
 import multer from 'multer';
-import { getAuthors, getAuthorById, uploadAvatarImage, checkForAlreadyExistingEmail, newAuthor, editAuthor, deleteAuthor, getAuthorBlogPosts } from './requestHandlers.js';
+import { getAuthorsCSV, getAuthors, getAuthorById, uploadAvatarImage, checkForAlreadyExistingEmail, newAuthor, editAuthor, deleteAuthor, getAuthorBlogPosts } from './requestHandlers.js';
 
 // Router
 const authorsRouter = express.Router();
 
 // Return list of all authors - GET
 authorsRouter.get("/", getAuthors);
+
+// Return csv of all authors - GET
+authorsRouter.get("/authorsCSV", getAuthorsCSV);
 
 // Return a single author by id - GET
 authorsRouter.get("/:id", getAuthorById);

@@ -11,7 +11,7 @@ export const cloudinaryStorage = new CloudinaryStorage({
   },
 });
 
-const { readJSON, writeJSON, writeFile } = fs; 
+const { readJSON, writeJSON, writeFile, createReadStream } = fs; 
 
 // Public folder path - serve static files
 //const publicFolderPath = join(process.cwd(), "./public/");
@@ -26,7 +26,11 @@ const blogPostsJSONPath = join(dataFolderPath, "blogPosts.json");
 // Functions related to retrieving and writing JSON files from different paths
 // Get authors.json
 export function getAuthorsJSON() {
-  return readJSON(booksJSONPath);
+  return readJSON(authorsJSONPath);
+}
+
+export function getAuthorsReadableStream() {
+  return createReadStream(authorsJSONPath);
 }
 // Write authors.json
 export function writeAuthorsJSON(content) {

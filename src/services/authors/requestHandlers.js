@@ -1,8 +1,9 @@
-import {getAuthorsJSON, writeAuthorsJSON, saveAvatarImages, getBlogPostsJSON} from "../../lib/fs-tools.js";
+import {getAuthorsReadableStream, getAuthorsJSON, writeAuthorsJSON, saveAvatarImages, getBlogPostsJSON} from "../../lib/fs-tools.js";
 import createHttpError from "http-errors";
 import { validationResult } from "express-validator";
 import uniqid from "uniqid";
 import { extname } from "path";
+import { pipeline } from "stream";
 
 export async function getAuthors(req,res,next) {
     try {
@@ -17,6 +18,21 @@ export async function getAuthors(req,res,next) {
     } catch (error) {
       next(error);
     }
+}
+
+export async function getAuthorsCSV(req,res,next) {
+  try {
+     res.setHeader("Content-Disposition", "attachment; filename=authors.csv");
+     const source = getAuthorsReadableStream();
+     const transform = new json2csv.Transform({fields: ["name", "surname", "email"]});
+     const destination = res;
+
+     pipeline(source, transform, destination, error => {if(error) {
+      console.log("Error with json to csv: ", error); 
+      next(error)}})
+  } catch (error) {
+    next(error);
+  }
 }
 
 export async function getAuthorById(req,res,next) {
