@@ -25,10 +25,8 @@ blogPostsRouter.get("/", getAllPosts);
 // GET /blogPosts/:id
 blogPostsRouter.get("/:id", getPostById);
 
-
 //GET /blogPosts/:id/downloadPDF
 blogPostsRouter.get("/:id/downloadPDF", downloadPDF);
-
 
 // GET /blogPosts/:id/comments
 blogPostsRouter.get("/:id/comments", getPostComments)

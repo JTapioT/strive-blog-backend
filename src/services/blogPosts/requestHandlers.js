@@ -77,6 +77,7 @@ export async function downloadPDF(req,res,next) {
 
       // I guess with responseType - expect response in arraybuffer(?):
       const response = await axios.get(blogPost.cover, {
+        // KOKEILE ILMAN
         responseType: "arraybuffer",
       })
       // Split url to parts, where "/" is found:

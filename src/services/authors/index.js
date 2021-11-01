@@ -22,6 +22,7 @@ authorsRouter.get("/:id/blogPosts", getAuthorBlogPosts);
 authorsRouter.post("/", authorPostValidation, newAuthor)
 
 // Upload author avatar image - POST
+// TODO - CLOUDINARY! 
 authorsRouter.post("/:id/uploadAvatar", multer().single("avatar"), uploadAvatarImage)
 
 // Check that same e-mail does not exist already - POST

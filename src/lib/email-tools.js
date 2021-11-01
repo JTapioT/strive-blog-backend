@@ -18,4 +18,4 @@ async function sendAuthorEmail(recipientEmail) {
 
 export default sendAuthorEmail;
 
-// Add here later also register function.
+// Add here later handler also for author registration?

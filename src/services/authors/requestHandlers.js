@@ -23,14 +23,17 @@ export async function getAuthors(req,res,next) {
 
 export async function getAuthorsCSV(req,res,next) {
   try {
-     res.setHeader("Content-Disposition", "attachment; filename=authors.csv");
-     const source = getAuthorsReadableStream();
-     const transform = new json2csv.Transform({fields: ["name", "surname", "email"]});
-     const destination = res;
-
-     pipeline(source, transform, destination, error => {if(error) {
-      console.log("Error with json to csv: ", error); 
-      next(error)}})
+    // Set header and filename for csv file.
+    res.setHeader("Content-Disposition", "attachment; filename=authors.csv");
+    // Create read stream for authors.json file
+    const source = getAuthorsReadableStream();
+    // Transform stream of data to csv. Include certain fields
+    const transform = new json2csv.Transform({fields: ["name", "surname", "email"]});
+    const destination = res;
+    // Pipeline to handle the overall stream?
+    pipeline(source, transform, destination, error => {if(error) {
+    console.log("Error with json to csv: ", error); 
+    next(error)}})
   } catch (error) {
     next(error);
   }
@@ -39,7 +42,7 @@ export async function getAuthorsCSV(req,res,next) {
 export async function getAuthorById(req,res,next) {
   try {
     // Read authors.json
-    const authors = getAuthorsJSON();
+    const authors = await getAuthorsJSON();
 
     // Find author from authors by id which is provided with request params
     const author = authors.find(
@@ -63,7 +66,7 @@ export async function getAuthorById(req,res,next) {
 export async function getAuthorBlogPosts(req,res,next) {
   try {
     // Read authors.json
-    const authors = getAuthorsJSON();
+    const authors = await getAuthorsJSON();
   
     // Find author from authors by id which is provided with request params
     const author = authors.find(
@@ -75,7 +78,7 @@ export async function getAuthorBlogPosts(req,res,next) {
       next(createHttpError(404, `No author found with an id: ${req.params.id}`));
     } else {
       // Filter blogPosts by author name? 
-      const blogPosts = getBlogPostsJSON();
+      const blogPosts = await getBlogPostsJSON();
       const postsByAuthor = blogPosts.filter(blogPost => blogPost.author.name === author.name);
       res.send(postsByAuthor);
     }
@@ -95,21 +98,21 @@ export async function newAuthor(req,res,next) {
     }
 
     // Read authors.json
-    const authors = getAuthorsJSON();
+    const authors = await getAuthorsJSON();
 
     // Create new author - add random id
     let newAuthor = {
       ...req.body,
       id: uniqid(),
-      avatar: `http://localhost:3001/public/avatarImages/${id}`,
       createdAt: new Date(),
+      updatedAt: null
     };
 
     // Push new author to existing authors array
     authors.push(newAuthor);
 
     // Overwrite existing authors.json
-    writeAuthorsJSON(authors);
+    await writeAuthorsJSON(authors);
 
     // Send response
     res.status(201).send({ id: newAuthor.id });
@@ -138,7 +141,7 @@ export async function uploadAvatarImage(req,res,next) {
     };
     authors[index] = editedAuthor;
 
-    writeAuthorsJSON(authors);
+    await writeAuthorsJSON(authors);
   } catch (error) {
     next(error);
   }
@@ -146,7 +149,7 @@ export async function uploadAvatarImage(req,res,next) {
 
 export async function checkForAlreadyExistingEmail(req,res,next) {
   try {
-    const authors = getAuthors();
+    const authors = await getAuthors();
     let response =
       authors.findIndex(
         (author) => author.email.toLowerCase() === req.body.email.toLowerCase()
@@ -163,7 +166,7 @@ export async function checkForAlreadyExistingEmail(req,res,next) {
 export async function editAuthor(req,res,next) {
   try {
     // Read authors.json
-    const authors = getAuthorsJSON();
+    const authors = await getAuthorsJSON();
 
     // Find index of an author within authors:
     let index = authors.findIndex(
@@ -180,7 +183,7 @@ export async function editAuthor(req,res,next) {
       authors[index] = editedAuthor;
 
       // Overwrite authors.json
-      writeAuthorsJSON(authors);
+      await writeAuthorsJSON(authors);
 
       // Send response
       res.status(200).send(editedAuthor);
@@ -193,7 +196,7 @@ export async function editAuthor(req,res,next) {
 export async function deleteAuthor(req,res,next) {
   try {
     // Read authors.json
-    const authors = getAuthors();
+    const authors = await getAuthors();
 
     // Filter out the author from authors
     let currentAuthors = authors.filter(
@@ -201,7 +204,7 @@ export async function deleteAuthor(req,res,next) {
     );
 
     // Overwrite existing authors.json
-    writeAuthors(currentAuthors);
+    await writeAuthors(currentAuthors);
 
     // Send response
     res.status(204).send();
